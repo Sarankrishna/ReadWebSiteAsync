@@ -19,9 +19,20 @@ namespace ReadWebSiteAsync
 
         private async void Button_Async_Click(object sender, RoutedEventArgs e)
         {
-            txtHTML.Text = string.Empty;
-            //txtHTML.Text = await GetStringAsyc(txtWebURL.Text);
-            txtHTML.Text = await GetStringAsycTaskCompletionSource(txtWebURL.Text);
+
+            try
+            {
+                txtHTML.Text = string.Empty;
+                //txtHTML.Text = await GetStringAsyc(txtWebURL.Text);
+                txtHTML.Text = await GetStringTask(txtWebURL.Text);
+                //txtHTML.Text = await GetStringAsycTaskCompletionSource(txtWebURL.Text);
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
         }
 
         private void Button_Sync_Click(object sender, RoutedEventArgs e)
@@ -30,7 +41,7 @@ namespace ReadWebSiteAsync
             txtHTML.Text = GetString(txtWebURL.Text);
         }
 
-        private Task<string> GetStringAsyc(string url)
+        private Task<string> GetStringTask(string url)
         {
             var client = new WebClient();
             var task = client.DownloadDataTaskAsync(new Uri(url));
@@ -41,6 +52,21 @@ namespace ReadWebSiteAsync
                 Thread.Sleep(5000);
                 return str;
             });
+            
+            return task2;
+        }
+
+        private async Task<string> GetStringAsyc(string url)
+        {
+            var client = new WebClient();
+            var htmlByte = await client.DownloadDataTaskAsync(new Uri(url));
+            var task2 = await Task.Factory.StartNew(() =>
+            {
+                var str = Encoding.Default.GetString(htmlByte);
+                Thread.Sleep(2000);
+                return str;
+            });
+            
             return task2;
         }
 
@@ -58,19 +84,68 @@ namespace ReadWebSiteAsync
 
             var tcs= new TaskCompletionSource<string>();
             Func<string,string> getstring = GetString;
-            
-            getstring.BeginInvoke(url, (a) =>
-            {
-                var result = getstring.EndInvoke(a);
-                tcs.SetResult(result);
-            }, null);
 
+            try
+            {
+                getstring.BeginInvoke(url, (a) =>
+                {
+                    
+                    var result = getstring.EndInvoke(a);
+                    tcs.SetResult(result);
+                }, null);
+
+
+            }
+            catch (Exception ex)
+            {
+
+                tcs.TrySetException(ex);
+            }
            
             return tcs.Task;
         }
 
+        private async Task OneTestAsync(int n)
+        {
+            await Task.Delay(n);
+        }
 
-        
+        private Task AnotherTestAsync(int n)
+        {
+            return Task.Delay(n);
+        }
 
+        private void DoTestAsync(Func<int, Task> whatTest, int n)
+        {
+            Task task = null;
+            try
+            {
+                // start the task
+                task = whatTest(n);
+
+                // do some other stuff, 
+                // while the task is pending
+                MessageBox.Show("Press enter to continue");
+                task.Wait();
+            }
+            catch (Exception ex)
+            {
+                Console.Write("Error: " + ex.Message);
+            }
+        }
+
+        private void Button_OneTextAsync(object sender, RoutedEventArgs e)
+        {
+
+                DoTestAsync(OneTestAsync, -2);
+
+        }
+
+        private void Button_AnotherTestAsync(object sender, RoutedEventArgs e)
+        {
+
+            DoTestAsync(AnotherTestAsync, -2);
+
+        }
     }
 }

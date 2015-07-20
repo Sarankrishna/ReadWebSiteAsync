@@ -8,6 +8,8 @@
         <TextBox Name="txtHTML" HorizontalAlignment="Left" Height="251" Margin="10,28,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="497"/>
         <Button Content="Get HTML Sync" HorizontalAlignment="Left" Height="26" Margin="392,284,0,0" VerticalAlignment="Top" Width="115" Click="Button_Sync_Click"/>
         <Button Content="Get HTML Async" HorizontalAlignment="Left" Height="26" Margin="255,284,0,0" VerticalAlignment="Top" Width="115" Click="Button_Async_Click"/>
+        <Button Content="One Test Async" HorizontalAlignment="Left" Height="26" Margin="10,284,0,0" VerticalAlignment="Top" Width="115" Click="Button_OneTextAsync"/>
+        <Button Content="Another Test" HorizontalAlignment="Left" Height="26" Margin="130,284,0,0" VerticalAlignment="Top" Width="115" Click="Button_AnotherTestAsync"/>
 
     </Grid>
 </Window>
